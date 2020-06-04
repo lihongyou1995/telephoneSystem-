@@ -1,0 +1,115 @@
+*{
+    padding: 0;
+    margin: 0; 
+}
+a{
+    color: #333333;
+    text-decoration: none;
+}
+li{
+    list-style: none;
+}
+#app {
+    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: #2c3e50 !important;
+    /* -moz-user-select: none; 
+    -webkit-user-select: none; 
+    -ms-user-select: none;
+    -khtml-user-select: none; 
+    user-select: none; */
+  }
+.el-loading-spinner i{
+   font-size: 36px !important;
+}
+.el-page-header__content {
+    font-size: 14px !important;
+}
+input{
+  outline: none;
+  border: none;
+  background: none;
+}
+button{
+  outline: none;
+  border: none;
+  cursor: pointer;
+}
+.el-dialog__header {
+    background: #333333 !important;
+}
+.el-dialog__title {
+    color: #fff !important;
+    font-size: 16px !important;
+}
+.el-dialog__headerbtn .el-dialog__close {
+    color: #fff !important;
+}
+.el-input__icon{
+  line-height: 0 !important;
+}
+.el-input__inner{
+    /* height: 30px !important; */
+}
+.el-message-box__header {
+    background: #333333 !important;
+}
+.el-message-box__title {
+    color: #fff !important;
+    font-size: 14px !important;
+}
+.el-message-box__headerbtn .el-message-box__close {
+    color: #fff !important;
+}
+.el-table{
+  font-size: 12px !important;
+}
+.el-table td, .el-table th{
+  padding: 4px 0 !important;
+}
+.el-button--mini, .el-button--mini.is-round{
+  padding: 5px 8px !important;
+}
+.el-message-box__title {
+    color: #fff !important;
+    font-size: 14px !important;
+}
+.el-input__icon {
+    height: 100% !important;
+    width: 25px !important;
+    text-align: center !important;
+    line-height: 0 !important;
+}
+.content{
+    padding: 15px !important;
+    -webkit-box-sizing: border-box !important;
+    box-sizing: border-box !important;
+}
+.returnbutton{
+  font-size: 12px !important;
+  cursor: pointer !important;
+  margin-bottom: 15px !important;
+}
+i{
+  cursor: pointer !important;
+}
+.el-table__body-wrapper{
+    height: 450px !important;
+    overflow: auto !important;
+}
+.el-badge__content{
+  border: none !important;
+}
+.el-submenu__title i{
+  color: #fff !important;
+}
+.el-form-item__content .el-input{
+    width: 200px !important;
+}
+.addtask .el-form-item__content .el-input{
+  width: 100% !important;
+}
+.current-row > td {
+  background: rgba(0, 158, 250, 0.219) !important;
+}
