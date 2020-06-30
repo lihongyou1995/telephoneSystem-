@@ -79,17 +79,7 @@ export default {
          },
     },
     mounted(){
-      // this.$http.test({
-      //   epContent: '111',
-      //   epDescribe: '222',
-      //   epEnclosure: '33',
-      //   epNumber: '333',
-      //   epTarget: '33',
-      //   epYear: '33',
-      //   id: '333',
-      // }).then(res=>{
-      //     console.log(res)
-      // })
+
     },
     created() {
         let that = this;
