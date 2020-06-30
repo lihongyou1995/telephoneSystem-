@@ -56,6 +56,15 @@ Vue.prototype.goBack = function () {
   router.go(-1)// 返回上一层
 }
 
+// setTimeout(() => {
+//   console.log("----" + this.$route.path)
+//   let routes = this.$route.path
+//   if (routes.indexOf('querydetails') == -1) {
+//     // localStorage.clear('keyword')
+//     console.log("跳转其他页面")
+//   }
+// }, 1000)
+
 NProgress.configure({
   easing: 'ease',
   showSpinner: false
@@ -97,7 +106,7 @@ Vue.prototype.resetSetItem = function (key, newVal) {
 Vue.directive('loadmore', {
   bind(el, binding) {
     const selectWrap = el.querySelector('.el-table__body-wrapper')
-    selectWrap.addEventListener('scroll', function() {
+    selectWrap.addEventListener('scroll', function () {
       let sign = 0
       const scrollDistance = this.scrollHeight - this.scrollTop - this.clientHeight
       if (this.scrollHeight > 80 && scrollDistance <= sign) {

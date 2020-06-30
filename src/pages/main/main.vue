@@ -4,13 +4,6 @@
     <main>
       <sidemenu @activefnc="getMsgFormSon"></sidemenu>
       <div class="content">
-        <!-- <p class="title">
-             <span>位置</span>
-            <span>
-              <i class="el-icon-arrow-right"></i>
-              {{sidemenuName}}
-            </span>
-        </p>-->
         <div class="content_main">
           <router-view></router-view>
         </div>

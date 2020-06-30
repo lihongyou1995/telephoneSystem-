@@ -143,17 +143,15 @@
 
     <!-- --------------------  数据列表 -->
     <div class="table sendFormUnitsfn">
-      <div class="lefttren">
+      <div class="lefttren" :class="[id_id==true?'lefttren_test':'']">
         <el-table
           border
           :header-cell-style="{background:'#F5F7FA'}"
-          header-cell-class-name="lefttren-table"
           :data="datatree"
-          style="width: 100%;margin-bottom: 20px;"
+          style="width: 100%;margin-bottom:20px"
           :row-key="session.roleId!=3?'unitId':'keyId'"
           default-expand-all
           @cell-click="handleNodeClick"
-          @click.stop
           ref="trees"
           highlight-current-row
           :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
@@ -351,6 +349,8 @@ export default {
   },
   data() {
     return {
+      unitIdssss: "",
+      id_id: true, //判断是否第二次点击
       parentkeyWords: "",
       parentPropertyId: "",
       sonkeyWords: "",
@@ -557,13 +557,15 @@ export default {
             propertyName: "序号",
             width: "60"
           });
-          res.data.push({
-            propertyName: "填报单位"
-          });
-          res.data.push({
-            propertyName: "数据标识",
-            width: "140"
-          });
+          if (this.roleId != 3) {
+            res.data.push({
+              propertyName: "填报单位"
+            });
+            res.data.push({
+              propertyName: "数据标识",
+              width: "140"
+            });
+          }
 
           this.tableheader = res.data;
           // console.log(this.tableheader)
@@ -650,7 +652,7 @@ export default {
                   );
                   _this.tableData[key]["序号"] = numsg;
                 }
-              }, 10);
+              }, 0);
             } else {
               _this.loading = true;
               _this.$message(res.data || res.message);
@@ -693,7 +695,7 @@ export default {
                   );
                   _this.tableData[key]["序号"] = numsg;
                 }
-              }, 10);
+              }, 0);
             } else {
               _this.loading = true;
               _this.$message(res.data || res.message);
@@ -945,7 +947,7 @@ export default {
     // 导出excel数据
     exportExcelData() {
       window.open(
-        `${this.exporyUrl}/dev/formOutput/exportExcel?formName=${this.formName}&ownUnitId=${this.unitId}&formId=${this.formId}&userId=${this.userId}&type=${this.exportFont}`
+        `${this.exporyUrl}/dev/newForm_/exportExcel?formName=${this.formName}&ownUnitId=${this.unitId}&formId=${this.formId}&userId=${this.userId}&type=${this.exportFont}`
       );
     },
     // 导出excel模板
@@ -1058,6 +1060,7 @@ export default {
     },
     // 数据审核
     adataExaminefn() {
+      let that = this;
       if (this.unkIdList.length > 0) {
         this.unkIdList.forEach(res => {
           this.unkIds.push(res.unkId);
@@ -1073,13 +1076,16 @@ export default {
         })
         .then(res => {
           this.unkIds = [];
-          // console.log(res)
-          // this.queryFormOfficialDatafn()
           if (res.code == 200) {
             this.$message.success("审核成功");
-            // this.sortedarrays()
-            this.tableData = [];
-            this.loads();
+            // that.tableData = [];
+            // that.loads();
+            if(that.dataStateValue == '所有数据'){
+              that.sortedarrays();
+            }else{
+              that.tableData = [];
+              that.loads();
+            }
           } else {
             this.$message(res.data || res.message);
           }
@@ -1171,7 +1177,7 @@ export default {
     },
     // 排序后的数组 （msg = 默认值）
     sortedarrays(msg = false) {
-      if (this.tableData.length == 0) return;
+      // if (this.tableData.length == 0) return;
       this.sortedarraysIndex = (this.pageIndex - 1) * this.pageSize;
       this.tableData.forEach(item => {
         this.sortedarraysIndex++;
@@ -1188,9 +1194,6 @@ export default {
         })
         .then(res => {
           this.sortArr = [];
-          // console.log(res)
-          // this.queryFormOfficialDatafn()
-          // this.cleanData()
           this.loads();
           if (!msg) return;
           return res.code == 200
@@ -1301,38 +1304,59 @@ export default {
     // 单位查看数据
     handleNodeClick(items) {
       var _this = this;
-      // console.log(items);
+      console.log(items.keyId);
       if (this.roleId == 3) {
         let selectNode = this.$refs.trees._props.data;
-        // console.log(selectNode);
-        selectNode.forEach((item, index) => {
-          // console.log(item);
-          if (item.data == items.data && item.id == items.id && item.unkId == items.unkId) {
+        if (_this.unitIdssss != items.keyId) {
+          //判断是否点击不同单位
+          _this.id_id = true;
+        }
+        if (_this.id_id === false) {
+          //点击同一单位时候  判断是否偶数次点击，偶数次点击就是全部数据
+          console.log("是重复点击！！！");
+          _this.parentPropertyId = "";
+          _this.parentkeyWords = "";
+          _this.sonkeyWords = "";
+          _this.sonPropertyId = "";
+        } else {
+          selectNode.forEach((item, index) => {
             // console.log(item);
-            _this.sonkeyWords = "";
-            _this.sonPropertyId = "";
-            _this.parentPropertyId = item.id;
-            _this.parentkeyWords = item.data;
-          } else {
-            var ds = [];
-            ds = item.children;
-            // console.log(ds);
-            ds.forEach((item1, index1) => {
-              if (item1.data == items.data && item1.id == items.id && item.unkId == items.unkId) {
-                console.log(item);
-                _this.parentPropertyId = item.id;
-                _this.parentkeyWords = item.data;
-                _this.sonkeyWords = items.data;
-                _this.sonPropertyId = items.id;
-              } else {
-                return false;
-              }
-            });
-          }
-        });
+            if (
+              item.data == items.data &&
+              item.id == items.id &&
+              item.unkId == items.unkId
+            ) {
+              // console.log(item);
+              _this.sonkeyWords = "";
+              _this.sonPropertyId = "";
+              _this.parentPropertyId = item.id;
+              _this.parentkeyWords = item.data;
+            } else {
+              var ds = [];
+              ds = item.children;
+              // console.log(ds);
+              ds.forEach((item1, index1) => {
+                if (
+                  item1.data == items.data &&
+                  item1.id == items.id &&
+                  item.unkId == items.unkId
+                ) {
+                  console.log(item);
+                  _this.parentPropertyId = item.id;
+                  _this.parentkeyWords = item.data;
+                  _this.sonkeyWords = items.data;
+                  _this.sonPropertyId = items.id;
+                } else {
+                  return false;
+                }
+              });
+            }
+          });
+        }
+        _this.unitIdssss = items.keyId;
+        _this.id_id = !_this.id_id;
+        // console.log(selectNode);
         this.currentPage = 1;
-        this.queryUnitId = items.unitId;
-        this.userId2 = items.userId;
         this.cleanData();
         if (this.ifdbclick == true) {
           setTimeout(() => {
@@ -1341,10 +1365,24 @@ export default {
           this.ifdbclick = false;
         }
       } else {
-        this.currentPage = 1;
-        this.queryUnitId = items.unitId;
-        this.userId2 = items.userId;
-        this.cleanData();
+        if (_this.queryUnitId != items.unitId) {
+          //判断是否点击不同单位
+          _this.id_id = true;
+        }
+        if (_this.id_id === false) {
+          //点击同一单位时候  判断是否偶数次点击，偶数次点击就是全部数据
+          console.log("是重复点击！！！");
+          _this.userId2 = sessionStorage.getItem("userID");
+          _this.queryUnitId = sessionStorage.getItem("unitId");
+        } else {
+          _this.queryUnitId = items.unitId;
+          _this.userId2 = items.userId;
+        }
+        _this.id_id = !_this.id_id;
+        _this.currentPage = 1;
+        // this.queryUnitId = items.unitId;
+        // this.userId2 = items.userId;
+        _this.cleanData();
         if (this.ifdbclick == true) {
           setTimeout(() => {
             this.loads(items);
@@ -1390,8 +1428,6 @@ export default {
           .then(res => {
             // console.log(res)
             this.form.values = [];
-            // this.queryFormOfficialDatafn()
-            // this.cleanData()
             this.loads();
             return res.code == 200
               ? this.$message.success("填报成功")
@@ -1547,7 +1583,20 @@ export default {
 };
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style >
+<style lang="less" >
+//树形结构  显示横向滚动条
+.lefttren .el-table .cell {
+  min-width: 100%;
+  display: inline-block;
+  white-space: nowrap;
+}
+</style>
+<style lang="less">
+.lefttren_test {
+  .current-row > td {
+    background: #fff !important;
+  }
+}
 </style>
 <style lang="less" scoped>
 .marginR {
@@ -1624,27 +1673,14 @@ export default {
   margin-bottom: 15px;
 }
 .lefttren {
-  width: 190px;
+  width: 210px;
   position: fixed;
-  // height: calc(100% - 300px);
   background: #fff;
   z-index: 9;
-  // margin-top: 20px;
-  .el-table__header-wrapper {
-    position: fixed;
-    z-index: 999;
-    .test-class .cell {
-      height: 40px;
-    }
-  }
-  .el-table__body-wrapper {
-    margin-top: 0;
-    // overflow-x: hidden !important;
-  }
 }
 .table_content {
-  margin-left: 210px;
-  width: calc(~"100% - 210px");
+  margin-left: 230px;
+  width: calc(~"100% - 230px");
   z-index: 2;
   position: relative;
   height: 100%;
@@ -1653,7 +1689,7 @@ export default {
   position: absolute;
   top: 0;
   right: 0;
-  z-index: 100000;
+  z-index: 10;
 }
 .treelist {
   line-height: 25px;
@@ -1668,16 +1704,6 @@ export default {
   .el-upload-list {
     display: none;
   }
-  // .el-table__header-wrapper {
-  //   position: fixed;
-  //   z-index: 999;
-  //   .test-class .cell {
-  //     height: 40px;
-  //   }
-  // }
-  // .el-table__body-wrapper {
-  //   margin-top:50px;
-  // }
 }
 .check1 .el-drawer__header {
   margin-bottom: 0px !important;

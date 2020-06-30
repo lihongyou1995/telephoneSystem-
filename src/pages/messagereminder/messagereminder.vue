@@ -20,6 +20,7 @@
             style="width: 100%"
             :header-cell-style="{background:'#f2f2f2'}"
             :row-class-name="rowClass"
+            :max-height="tableheight"
           >
             <!-- :highlight-current-row="true" -->
             <el-table-column
@@ -87,7 +88,7 @@
                   size="small"
                   scope.row
                   v-if="scope.row.state=='未读'"
-                   :disabled="true"
+                  :disabled="true"
                 >{{scope.row.state}}</el-button>
               </template>
             </el-table-column>
@@ -126,6 +127,7 @@ export default {
   name: "messagereminder",
   data() {
     return {
+      tableheight:400,
       msgid: [],
       countData: 0,
       pageIndex: 1,
@@ -215,6 +217,9 @@ export default {
     }
   },
   mounted() {
+    setTimeout(() => {
+      this.tableheight = window.innerHeight - 300;
+    }, 0);
     this.getallFormNewsfn();
   },
 

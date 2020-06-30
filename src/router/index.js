@@ -1,7 +1,11 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 Vue.use(Router)
-
+// 解决重复路由
+const routerPush = Router.prototype.push;
+Router.prototype.push = function push(location) {
+  return routerPush.call(this, location).catch(error => error);
+};
 export default new Router({
   mode: 'hash', // history , hash
   routes: [

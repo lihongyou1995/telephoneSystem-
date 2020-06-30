@@ -23,6 +23,7 @@
                         label="类型"
                         align="center"
                         :resizable="false"
+                        width="150"
                         >
                     </el-table-column>
                     <el-table-column
@@ -30,6 +31,7 @@
                         label="创建人"
                         align="center"
                         :resizable="false"
+                        width="150"
                         >
                     </el-table-column>
                     <el-table-column
@@ -37,6 +39,7 @@
                         label="创建时间"
                         align="center"
                         :resizable="false"
+                        width="150"
                     >
                     </el-table-column>
                     <el-table-column :resizable="false" label="操作"  width="100" align="center" >

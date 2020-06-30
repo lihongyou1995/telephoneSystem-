@@ -1,9 +1,9 @@
 <template>
   <div class="querydetails">
     <div class="content">
-      <div class="header" >
+      <div class="header">
         <!-- <el-page-header @back="goBack" content="详情页面"></el-page-header> -->
-        <el-button type="primary" size="medium" @click="goBack" icon="el-icon-arrow-left">返回</el-button>
+        <el-button type="primary" size="medium" @click="goBack1" icon="el-icon-arrow-left">返回</el-button>
         <div class="querystatisticssosuo">
           <el-input
             placeholder="输入关键字进行查找"
@@ -211,6 +211,14 @@ export default {
     };
   },
   methods: {
+    goBack1() {
+      this.$router.push({
+        name:'querystatistics',
+        query:{
+          keyword:this.keyword
+        }
+      })
+    },
     handleSizeChange(size) {
       console.log(size);
       this.pageSize = size;
@@ -230,10 +238,8 @@ export default {
     },
     // 获取数据
     qryQueryStatisticsDataListfn() {
-      if (this.keyword.indexOf(",") != -1 || this.keyword.indexOf(":") != -1)
-        return this.$message("查询关键字不能含有英文状态下的逗号或者冒号");
       let _this = this;
-      _this.loadData = []
+      _this.loadData = [];
       _this.$http
         .qryQueryStatisticsDataList({
           dataType: this.dataType,
@@ -431,6 +437,7 @@ export default {
 
     // 1收藏 2取消
     vieworedit(item, type) {
+      this.loadDatas = [];
       this.phoneBookList = [];
       console.log(item);
       this.phoneBookList.push({
@@ -480,29 +487,6 @@ export default {
         }
       });
     },
-
-    // 查询详情------------------------------------------------------------------
-    // qryQueryStatisticsDataListfn(){
-    //   this.detailstabledata = [];
-    //   this.$http.qryQueryStatisticsDataList({
-    //     dataType:this.dataType,
-    //     objId:this.objectId,
-    //     userId:this.userId,
-    //     keyWords:this.keyword,
-    //     unitProperty:this.propertyName,
-    //     unitCatagory:this.unitCatagory,
-    //     unitLevel:this.unitLevel,
-    //   }).then(res =>{
-    //     console.log(res)
-    //     if(res.code == 201){
-    //       if(res.data instanceof Array){
-    //         this.detailstabledata = res.data;
-    //       }
-    //     }else{
-    //       this.$message(res.data || res.message);
-    //     }
-    //   })
-    // },
     searchbtn() {
       this.currentPage = 1;
       console.log(this.keyword);
@@ -643,7 +627,7 @@ export default {
       .el-table__body-wrapper {
         margin: 0;
       }
-      .el-table__body-wrapper .el-table__row:nth-child(1){
+      .el-table__body-wrapper .el-table__row:nth-child(1) {
         background-color: rgb(242, 242, 242) !important;
       }
       // .el-table__header-wrapper {

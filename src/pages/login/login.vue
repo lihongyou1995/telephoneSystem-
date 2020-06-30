@@ -24,7 +24,7 @@
                         <!-- <button class="login-btn" @click="submit">登录</button> -->
                          <el-button class="login-btn" type="primary" @click="submit" size="mini">登 录</el-button>
                     </div>
-                    
+
                 </div>
             </div>
         </main>
@@ -43,15 +43,7 @@ export default {
     },
     methods:{
          submit(){
-            //  this.$router.push({
-            //             name:'home',
-            //             params:{
-            //                 isLogin:true
-            //             }
-            //         });
-            // return;
             if(this.account == '' || this.password == '') return this.$message('账号和密码不能为空');
-            // if(this.account.indexOf(",") == -1 || this.password.indexOf(",") == -1 || this.password.indexOf(":") == -1 || this.account.indexOf(":") == -1) return this.$message('不能输入英文状态下的“,”或者“:”');
             const loading = this.$loading({
                 lock: true,
                 text: '正在登录，请稍后...',
@@ -87,11 +79,21 @@ export default {
          },
     },
     mounted(){
-      
+      // this.$http.test({
+      //   epContent: '111',
+      //   epDescribe: '222',
+      //   epEnclosure: '33',
+      //   epNumber: '333',
+      //   epTarget: '33',
+      //   epYear: '33',
+      //   id: '333',
+      // }).then(res=>{
+      //     console.log(res)
+      // })
     },
     created() {
         let that = this;
-        
+
         document.onkeypress = function(e) {
         var keycode = document.all ? event.keyCode : e.which;
         if (keycode == 13 && document.location.hash == "#/") {
@@ -99,7 +101,7 @@ export default {
                 that.submit();// 登录方法名
                 return false;
             }
-            
+
         }
     };
   }
@@ -151,7 +153,7 @@ export default {
             position: fixed;
             width: 100%;
             height: 100%;
-            
+
             .login_btn{
                 text-align: center;
                 height: 35px;
@@ -207,7 +209,7 @@ export default {
                         input::placeholder{
                             color: #1f5ea1;
                         }
-                       
+
                     }
                     .login-btn{
                         width:260px;
@@ -217,7 +219,7 @@ export default {
                         float: right;
                         background: #00baff;
                     }
-                    
+
                 }
             }
         }

@@ -5,7 +5,7 @@
                 <p>单位架构</p>
                 <div  id="jiagou">
                 <el-table
-                    max-height="600"
+                    :max-height="600"
                     :data="queryUserTreedata"
                     style="width: 100%;margin-bottom: 20px;"
                     row-key="id"
@@ -192,7 +192,14 @@
 <script>
 export { default } from './js/index'
 </script>
-
+<style lang="less" >
+//树形结构  显示横向滚动条
+#jiagou .el-table .cell{
+    min-width:100%;
+    display: inline-block;
+    white-space: nowrap;
+}
+</style>
  <style lang="less" scoped>
  .dialog-footer{
      display: flex;

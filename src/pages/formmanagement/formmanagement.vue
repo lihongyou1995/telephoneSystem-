@@ -44,8 +44,8 @@
           <el-table-column
             v-if="roleId == 1 && unitId != 0"
             label="操作"
-            width="200"
-            align="center"
+            width="190"
+            align="left"
             fixed="right"
           >
             <template slot-scope="scope">
@@ -81,6 +81,7 @@
           <el-pagination
             @size-change="handleSizeChange"
             @current-change="handleCurrentChange"
+            :current-page.sync="currentpage"
             :page-size="pageSize"
             layout="total, sizes, prev, pager, next"
             :total="countData"
@@ -98,14 +99,25 @@
           :header-cell-style="getRowClass"
         >
           <el-table-column prop="formName" label="表单名称" align="center"></el-table-column>
-          <el-table-column prop="formTypeCN" label="表单类型" align="center"></el-table-column>
-          <el-table-column prop="createTime" label="创建时间" align="center"></el-table-column>
+          <el-table-column prop="formTypeCN" label="表单类型" align="center" width="150"></el-table-column>
+          <el-table-column prop="createTime" label="创建时间" align="center" width="150"></el-table-column>
           <el-table-column label="操作" width="100" align="center">
             <template slot-scope="scope">
               <el-button size="mini" type="primary" @click="vieworedit(scope.row,1)">查看</el-button>
             </template>
           </el-table-column>
         </el-table>
+        <!-- 分页 -->
+        <div class="block">
+          <el-pagination
+            @size-change="handleSizeChange1"
+            @current-change="handleCurrentChange1"
+            :current-page.sync="currentpage1"
+            :page-size="pageSize"
+            layout="total, sizes, prev, pager, next"
+            :total="countData"
+          ></el-pagination>
+        </div>
       </div>
 
       <!-- 复制
@@ -526,12 +538,17 @@ export default {
       timeH: 100,
       formNameInfo: "",
       timeData: [],
-      isno: true
+      isno: true,
+      tableData1: [],
+      currentpage: 1,
+      currentpage1: 1
     };
   },
   methods: {
     // 查询表单数据
     querydata() {
+      this.tableData1 = [];
+      this.tableData = [];
       this.$http
         .newGetFormTabShow(
           `userId=${this.userId}&unitId=${this.unitId}&roleId=${this.roleId}&pageNum=${this.pageIndex}&pageSize=${this.pageSize}`
@@ -539,11 +556,11 @@ export default {
         .then(res => {
           console.log(res);
           if (res.code == 200) {
-            this.tableData = res.data;
+            this.tableData1 = res.data;
             this.countTime();
-            this.countData = res.data.countData;
+            this.countData = res.data.length;
             let a = [];
-            this.tableData.forEach(item => {
+            this.tableData1.forEach(item => {
               console.log(item);
               if (item.stateCN == "待上报") {
                 // this.timeData.push(item);
@@ -552,56 +569,64 @@ export default {
           } else {
             this.$message(res.data || res.message);
           }
+          this.fenye(1);
         });
     },
 
-    // 查询用户表单数据
+    // 查询用户表单数据  roleid==3
     queryuserdata() {
+      this.tableData = [];
       this.$http
         .getFormObj(`userId=${this.userId}&formState=${this.formState}`)
         .then(res => {
           console.log(res);
           if (res.code == 200 && res.data instanceof Array) {
-            this.tableData = res.data;
+            this.tableData1 = res.data;
           } else {
             this.$message(res.data || res.message);
           }
+          this.fenye(1);
         });
     },
 
     // 倒计时
     countTime() {
-      // 获取当前时间
+      //获取当前时间
       var date = new Date();
       var now = date.getTime();
       this.tableData.forEach(res => {
+        // console.log(res);
         if (res.createUserId == this.userId || res.endTime == null) {
-          return (res.endTimes = "无");
-        }
-        // console.log(res.endTime)
-        var end = new Date(res.endTime).getTime();
-        var leftTime = end - now;
-        if (leftTime >= 0) {
-          var d = Math.floor(leftTime / 1000 / 60 / 60 / 24),
-            h = Math.floor((leftTime / 1000 / 60 / 60) % 24),
-            m = Math.floor((leftTime / 1000 / 60) % 60),
-            s = Math.floor((leftTime / 1000) % 60);
-          var djs = `${d}天${h}小时${m}分${s}秒`;
-          res.endTimes = djs;
-          // this.timeH = h;
-          // console.log(res)
-          // this.timeData = [];
-
-          if (h <= 3 && this.isno) {
-            this.$notify({
-              title: "警告",
-              message: "请注意，您有即将到期的表单！",
-              type: "warning"
-            });
-            this.isno = false;
-          }
+          res.endTimes = "无";
         } else {
-          res.endTimes = "已到截止时间";
+          var end = new Date(res.endTime).getTime();
+          var leftTime = end - now;
+          if (leftTime >= 0) {
+            var d = Math.floor(leftTime / 1000 / 60 / 60 / 24),
+              h = Math.floor((leftTime / 1000 / 60 / 60) % 24),
+              m = Math.floor((leftTime / 1000 / 60) % 60),
+              s = Math.floor((leftTime / 1000) % 60);
+            var djs = `${d}天${h}小时${m}分${s}秒`;
+            if (res.stateCN != "数据采集已完成") {
+              res.endTimes = djs;
+            } else if (res.stateCN == "数据采集已完成") {
+              res.endTimes = "已完成";
+            }
+            if (d < 1 && h <= 3 && this.isno) {
+              this.$notify({
+                title: "警告",
+                message: "请注意，您有即将到期的任务！",
+                type: "warning"
+              });
+              this.isno = false;
+            }
+          } else {
+            if (res.stateCN == "数据采集已完成") {
+              res.endTimes = "已完成";
+            } else {
+              res.endTimes = "已超时";
+            }
+          }
         }
         // 使用this.$set()方法赋值，解决vue实例不更新视图问题
         this.$set(this.tableData, res.endTimes, djs);
@@ -631,13 +656,49 @@ export default {
     // 分页
     handleSizeChange(size) {
       console.log(size);
+      this.tableData = [];
+      this.currentpage = 1;
       this.pageSize = size;
-      this.querydata();
+      this.fenye(1);
+      // this.querydata();
     },
     handleCurrentChange(page) {
       console.log(page);
+      this.tableData = [];
       this.pageIndex = page;
-      this.querydata();
+      this.fenye(page);
+      // this.querydata();
+    },
+    // roleId==3  分页
+    handleSizeChange1(size) {
+      this.tableData = [];
+      this.currentpage1 = 1;
+      this.pageSize = size;
+      this.fenye(1);
+    },
+    handleCurrentChange1(page) {
+      let _this = this;
+      _this.tableData = [];
+      console.log(page);
+      console.log(`页数${page}`);
+      console.log(`pagesize${_this.pageSize}`);
+      _this.fenye(page);
+    },
+    // 自定义分页---专项任务
+    fenye(page) {
+      let _this = this;
+      for (let i in _this.tableData1) {
+        // console.log(i);
+        if (
+          i >= parseInt((page - 1) * _this.pageSize) &&
+          i < parseInt((page - 1) * _this.pageSize + _this.pageSize)
+        ) {
+          console.log(_this.tableData1[i]);
+          _this.tableData.push(_this.tableData1[i]);
+        }
+      }
+      _this.countData = _this.tableData1.length; //总数
+      console.log(_this.tableData);
     },
     // 选择表单
     selectiontaball(selection) {
@@ -646,13 +707,6 @@ export default {
       if (selection.length > 0) {
         selection.forEach(e => {
           this.formIdList.push(e.id);
-          // this.formnames.push(e.formName)
-          // this.formName = e.formName;
-          // if(e.stateCnName == '待上报' || e.stateCnName == '待下发'){
-          //     this.istuisong = true;
-          // }else{
-          //     this.istuisong = false;
-          // }
         });
       } else {
         this.formIdList = [];
@@ -964,6 +1018,7 @@ export default {
     },
     // 复制表单事件
     copyform() {
+      this.currentpage = 1;
       //   this.dialogFormVisible = true
       if (this.formIdList.length == 0) {
         this.$message({
@@ -1028,9 +1083,10 @@ export default {
     },
     // 新增表单提交事件
     submitForm(formName) {
-      // console.log(this.form.formName);
-      // console.log(this.form.formType);
-      // console.log(this.form.domains);
+      this.currentpage = 1;
+      this.tableData = [];
+      this.fenye(1);
+      this.tableData1 = [];
       if (
         this.form.formName.indexOf(",") != -1 ||
         this.form.formName.indexOf(":") != -1 ||
@@ -1110,7 +1166,7 @@ export default {
               controlname: this.form.paragraphName,
               valueList: []
             });
-            this.$message.success('添加成功！')
+            this.$message.success("添加成功！");
           } else if (this.radio == 2) {
             let isaddse = true;
             let values = [];
@@ -1137,7 +1193,6 @@ export default {
       } else {
         this.$message("字段名称不能为空并且不超过30个字符");
       }
-      
     },
 
     submitForm2(formName) {

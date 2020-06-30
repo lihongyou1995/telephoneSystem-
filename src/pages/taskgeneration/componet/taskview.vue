@@ -127,7 +127,7 @@
         </div>
       </div>
       <div class="tableData">
-        <div class="lefttren" v-if="roleId!=3">
+        <div class="lefttren" :class="[id_id==true?'lefttren_test':'']" v-if="roleId!=3">
           <el-table
             border
             :data="datatree"
@@ -136,7 +136,6 @@
             row-key="unitId"
             default-expand-all
             @cell-click="handleNodeClick"
-            @click.stop
             highlight-current-row
             :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
             :max-height="tableheight"
@@ -145,7 +144,7 @@
           </el-table>
         </div>
 
-        <div class="lefttren" v-if="roleId==3">
+        <div class="lefttren" :class="[id_id1==true?'lefttren_test':'']" v-if="roleId==3">
           <el-table
             border
             :data="datatree"
@@ -154,7 +153,6 @@
             row-key="keyId"
             default-expand-all
             @cell-click="handleNodeClick1"
-            @click.stop
             ref="tree"
             highlight-current-row
             :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
@@ -367,6 +365,9 @@ export default {
   },
   data() {
     return {
+      unitIdssss: "",
+      id_id: true, //根据这个值判断是否是第二次点击单位
+      id_id1: true, //根据这个值判断是否是第二次点击单位
       sonKeyWords: "",
       sonPropertyId: "",
       parentKeyWords: "",
@@ -444,7 +445,6 @@ export default {
         label: "unitName"
       },
       serial: "",
-      ifloads: "1",
       ifloads1: "1",
       menudata: {
         // 菜单box的样式  Menu box style
@@ -649,12 +649,13 @@ export default {
                   );
                   _this.tabledata[key]["序号"] = numsg;
                 }
-              }, 10);
+              }, 0);
+              this.countData = res.data.countData;
+              return _this.tabledata;
             } else {
               _this.loading = true;
               _this.$message(res.data || res.message);
             }
-            this.countData = res.data.countData;
           });
       } else if (this.roleId == 3) {
         console.log("11-1-1--1-1-1-----" + sessionStorage.getItem("userID"));
@@ -696,7 +697,8 @@ export default {
                   );
                   _this.tabledata[key]["序号"] = numsg;
                 }
-              }, 10);
+              }, 0);
+              // return  _this.tabledata
             } else {
               _this.loading = true;
               _this.$message(res.data || res.message);
@@ -962,7 +964,6 @@ export default {
     // 导出按钮
     exportbtn() {
       this.exportDialog = true;
-      // this.sortedarrays(false);
     },
     // 选择导出类型
     changeExportType(type) {
@@ -990,7 +991,7 @@ export default {
     //导出excel数据
     exportExcelData() {
       window.open(
-        `${this.exporyUrl}/dev/taskOutput/exportExcel?ownUnitId=${this.unitId}&taskName=${this.taskName}&taskId=${this.taskId}&userId=${this.userId}&type=${this.exportFont}`
+        `${this.exporyUrl}/dev/task/exportExcel?ownUnitId=${this.unitId}&taskName=${this.taskName}&taskId=${this.taskId}&userId=${this.userId}&type=${this.exportFont}`
       );
     },
     //导出excel模板
@@ -1220,18 +1221,15 @@ export default {
         let a = item.unkId + ":" + index;
         this.sortArr.push(a);
       });
-      // console.log(this.sortArr)
       this.$http
         .updateTaskDataSerialNumber({
           unkIds: this.sortArr.toString(),
           taskId: this.taskId
         })
         .then(res => {
-          // console.log(res)
           this.sortArr = [];
           if (res.code == 200) {
-            // this.getDataListfn();
-            this.tabledata = [];
+            _this.tabledata = [];
             _this.loads();
             if (msg) {
               this.$message.success("排序成功");
@@ -1357,18 +1355,7 @@ export default {
 
     // 数据审核
     approvalorrejectionofaudit() {
-      // if(this.vivewstr == '下发'){
-      //   this.orderBy = 1;
-      //   this.accepectUserId = 0;
-      //   this.publishUnitId = this.sendUnitId;
-      // }else if(this.vivewstr == '分发'){
-      //   this.orderBy = 2;
-      //   this.publishUnitId = 0;
-      //   this.accepectUserId = this.userId2;
-      // }
-      // if(this.unkIds.length===0){
-      //   this.$message("请选择待审核数据")
-      // }
+      let that = this;
       this.$http
         .taskDataExamine({
           userId: this.userId,
@@ -1381,13 +1368,17 @@ export default {
           publishUnitId: this.publishUnitId
         })
         .then(res => {
-          // console.log(res)
-          // this.getDataListfn();
           this.unkIds = [];
           if (res.code == 200) {
             this.$message.success("审核通过成功");
-            this.tabledata = [];
-            this.loads();
+            console.log("000000000000000000000000")
+            console.log(that.dataStateValue)
+            if (that.dataStateValue == "所有数据") {
+              that.sortedarrays();
+            } else {
+              that.tabledata = [];
+              that.loads();
+            }
           } else {
             this.$message(res.data || res.message);
           }
@@ -1431,43 +1422,64 @@ export default {
       this.pageIndex = 1;
       this.loadData = [];
       this.tabledata = [];
-      this.ifloads = "1";
     },
     // roleId==3的时候，根据单位查看
     handleNodeClick1(row, column, cell, event) {
       var _this = this;
       // console.log(cell);
       let selectNode = this.$refs.tree._props.data;
-      selectNode.forEach((item, index) => {
-        console.log(item);
-        if (item.data == row.data && item.id == row.id && item.unkId == row.unkId) {
-          _this.parentPropertyId = item.id;
-          _this.parentKeyWords = item.data;
-          _this.sonKeyWords = "";
-          _this.sonPropertyId = "";
-        } else {
-          var ds = [];
-          ds = item.children;
-          // console.log(ds);
-          ds.forEach((item1, index1) => {
-            if (item1.data == row.data && item1.id == row.id && item.unkId == row.unkId) {
-              _this.parentPropertyId = item.id;
-              _this.parentKeyWords = item.data;
-              _this.sonKeyWords = row.data;
-              _this.sonPropertyId = row.id;
-            }
-          });
-        }
-      });
-      // console.log(selectNode);
+
+      if (_this.unitIdssss != row.keyId) {
+        //判断是否点击不同单位
+        this.id_id1 = true;
+      }
+      if (this.id_id1 === false) {
+        //点击同一单位时候  判断是否偶数次点击，偶数次点击就是全部数据
+        console.log("是重复点击！！！");
+        _this.parentPropertyId = "";
+        _this.parentKeyWords = "";
+        _this.sonKeyWords = "";
+        _this.sonPropertyId = "";
+      } else {
+        selectNode.forEach((item, index) => {
+          console.log(item);
+          if (
+            item.data == row.data &&
+            item.id == row.id &&
+            item.unkId == row.unkId
+          ) {
+            _this.parentPropertyId = item.id;
+            _this.parentKeyWords = item.data;
+            _this.sonKeyWords = "";
+            _this.sonPropertyId = "";
+          } else {
+            var ds = [];
+            ds = item.children;
+            // console.log(ds);
+            ds.forEach((item1, index1) => {
+              if (
+                item1.data == row.data &&
+                item1.id == row.id &&
+                item.unkId == row.unkId
+              ) {
+                _this.parentPropertyId = item.id;
+                _this.parentKeyWords = item.data;
+                _this.sonKeyWords = row.data;
+                _this.sonPropertyId = row.id;
+              }
+            });
+          }
+        });
+      }
+      this.id_id1 = !this.id_id1;
+      _this.unitIdssss = row.keyId;
       this.currentPage = 1;
-      this.unitId = row.unitId;
-      this.userId = row.userId;
+      // this.unitId = row.unitId;
+      // this.userId = row.userId;
       this.cleanData();
       if (this.ifdbclick == true) {
         setTimeout(() => {
           this.loads();
-          this.ifloads = "1";
         }, 0);
         this.ifdbclick = false;
         console.log(this.ifdbclick);
@@ -1476,19 +1488,28 @@ export default {
 
     // 根据单位查看数据
     handleNodeClick(row, column, cell, event) {
-      console.log("点击单位" + row.unitId);
+      console.log(row.unitId);
+      if (this.unitId != row.unitId) {
+        //判断是否点击不同单位
+        this.id_id = true;
+      }
+      if (this.id_id === false) {
+        //点击同一单位时候  判断是否偶数次点击，偶数次点击就是全部数据
+        console.log("是重复点击！！！");
+        this.userId = sessionStorage.getItem("userID");
+        this.unitId = sessionStorage.getItem("unitId");
+      } else {
+        this.unitId = row.unitId;
+        this.userId = row.userId;
+      }
+      this.id_id = !this.id_id;
       this.currentPage = 1;
-      // console.log(this.ifloads)
-      this.unitId = row.unitId;
-      this.userId = row.userId;
       this.cleanData();
       if (this.ifdbclick == true) {
         setTimeout(() => {
           this.loads();
-          this.ifloads = "1";
         }, 0);
         this.ifdbclick = false;
-        console.log(this.ifdbclick);
       }
     }
   },
@@ -1583,7 +1604,20 @@ export default {
   }
 };
 </script>
-<style >
+<style lang="less" >
+//树形结构  显示横向滚动条
+.lefttren .el-table .cell {
+  min-width: 100%;
+  display: inline-block;
+  white-space: nowrap;
+}
+</style>
+<style lang="less">
+.lefttren_test {
+  .current-row > td {
+    background: #fff !important;
+  }
+}
 </style>
 <style lang="less" scoped>
 .marginR {
@@ -1615,8 +1649,8 @@ export default {
 //   display: table-cell!important;
 // }
 .table_content {
-  margin-left: 210px;
-  width: calc(100% - 210px);
+  margin-left: 230px;
+  width: calc(100% - 230px);
   z-index: 10;
   position: absolute;
   right: 0;
@@ -1646,19 +1680,10 @@ export default {
     z-index: 9 !important;
   }
   .lefttren {
-    width: 190px;
+    width: 210px;
     position: fixed;
     z-index: 9;
-    // height: calc(100% - 300px);
     background: #fff;
-    // margin-top: 20px;
-    .left_p {
-      font-size: 14px;
-      margin-bottom: 15px;
-    }
-    .el-table__body-wrapper {
-      // overflow-x:hidden !important;
-    }
   }
 }
 .el-page-header {

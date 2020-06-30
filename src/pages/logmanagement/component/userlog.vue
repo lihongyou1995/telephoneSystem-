@@ -15,16 +15,6 @@
                     style="width: 100%;"
                     :header-cell-style="getRowClass"
                     >
-                    <!-- <el-table-column
-                        type="selection"
-                        width="55">
-                    </el-table-column> -->
-                    <!-- <el-table-column
-                        prop="isRead"
-                        label="状态"
-                        align="center"
-                    >
-                    </el-table-column> -->
                     <el-table-column
                         prop="sysLog.operation"
                         label="操作记录"
