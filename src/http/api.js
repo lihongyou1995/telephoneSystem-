@@ -32,15 +32,6 @@ import { qspost2} from './ajax2'
  */
 
 
-// //  测试
-// const test = params => post('/EtEnterprisePolicy/addEtEnterprisePolicyInfo', params)
-
-
-
-
-
-
-
 // 登录/登出
 const login = params => post('/user/login', params)
 const logout = params => post('/user/logout', params)
