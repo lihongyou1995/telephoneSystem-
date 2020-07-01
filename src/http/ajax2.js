@@ -3,7 +3,6 @@ import Qs from 'qs'
 import { Message} from 'element-ui'
 import Vue from 'vue'
 
-// const URL = 'http://localhost:8888/dev'
 // const URL = 'http://192.168.0.114:8888/dev'
 const URL = "http://sjzh2016.ticp.io:8888/dev";
 // const URL = 'http://192.168.31.54:6113/user'
