@@ -30,8 +30,6 @@ import { qspost2} from './ajax2'
  * 统一管理api接口
  * @param {string} params
  */
-
-
 // 登录/登出
 const login = params => post('/user/login', params)
 const logout = params => post('/user/logout', params)
