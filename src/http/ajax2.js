@@ -4,7 +4,8 @@ import { Message} from 'element-ui'
 import Vue from 'vue'
 
 // const URL = 'http://192.168.0.114:8888/dev'
-const URL = "http://sjzh2016.ticp.io:8888/dev";
+const URL = 'http://192.168.1.8:8888/dev'
+// const URL = "http://sjzh2016.ticp.io:8888/dev";
 
 let loading
 function startLoading () {
